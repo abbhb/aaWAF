@@ -74,13 +74,13 @@
 - [1] Java 反序列化
     - ✅ Fastjson 反序列化 (2025-08-30更新)
     - ❌ Spring 反序列化
-    - ✅ Jackson 反序列化
+    - ✅ Jackson 反序列化(2025-08-30更新)
     - ❌ Hibernate 反序列化
-    - ✅ JNdi 反序列化
+    - ✅ JNdi 反序列化(2025-08-30更新)
     - ❌ Shiro 反序列化
-    - ✅ JDBC 反序列化
+    - ✅ JDBC 反序列化(2025-08-30更新)
     - ❌ Expression 反序列化
-    - ✅ H2 
+    - ✅ H2 (2025-08-30更新)
 
 - [2] Java代码注入:
   - ❌ OGNL表达式
