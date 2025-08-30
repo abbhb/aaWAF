@@ -72,15 +72,15 @@
     - ❌ ASP.NET VB.NET 代码注入
 
 - [1] Java 反序列化
-    - ❌ Fastjson 反序列化
+    - ✅ Fastjson 反序列化 (2025-08-30更新)
     - ❌ Spring 反序列化
-    - ❌ Jackson 反序列化
+    - ✅ Jackson 反序列化
     - ❌ Hibernate 反序列化
-    - ❌ JNdi 反序列化
+    - ✅ JNdi 反序列化
     - ❌ Shiro 反序列化
-    - ❌ JDBC 反序列化
+    - ✅ JDBC 反序列化
     - ❌ Expression 反序列化
-    - ❌ H2 
+    - ✅ H2 
 
 - [2] Java代码注入:
   - ❌ OGNL表达式
