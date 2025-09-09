@@ -177,11 +177,11 @@ func (config *Config) SetCert(request *http.Request) core.Response {
 	if err != nil {
 		return core.Fail(err)
 	}
-	token, err := jwt.ParseTokenWithRequest(request)
-	if err != nil {
-		return core.Fail(err)
-	}
-	uid := token.Uid()
+	// token, err := jwt.ParseTokenWithRequest(request)
+	// if err != nil {
+	// 	return core.Fail(err)
+	// }
+	// uid := token.Uid()
 	if _, ok := params["certContent"]; !ok {
 		return core.Fail("请输入证书内容")
 	}
@@ -194,7 +194,7 @@ func (config *Config) SetCert(request *http.Request) core.Response {
 		time.Sleep(10 * time.Millisecond)
 		_, err = public.ExecCommandCombined("bash", "-c", "cat /www/cloud_waf/console/data/.pid |xargs kill -9;nohup /www/cloud_waf/console/CloudWaf >> /www/cloud_waf/console/logs/error.log 2>&1 &")
 	}()
-	public.WriteOptLog(fmt.Sprintf("证书设置成功"), public.OPT_LOG_TYPE_SYSTEM, uid)
+	// public.WriteOptLog(fmt.Sprintf("证书设置成功"), public.OPT_LOG_TYPE_SYSTEM, uid)
 	return core.Success("证书设置成功")
 }
 
