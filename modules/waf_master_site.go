@@ -3125,6 +3125,12 @@ func ParseSiteJson(siteJson types.SiteJson) error {
 		if err != nil {
 			return err
 		}
+		// 自定义Header 写入到配置文件中
+		userFileSetHeader := types.UserPath + siteJson.SiteID + "_set_header.conf"
+		err = os.WriteFile(userFileSetHeader, []byte(siteJson.Server.UserIncludeHeaderText), 0644)
+		if err != nil {
+			return err
+		}
 
 	}
 	err := ReloadNginx()
