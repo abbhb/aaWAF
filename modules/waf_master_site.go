@@ -460,8 +460,10 @@ func (s *Wafmastersite) ModifySite(request *http.Request) core.Response {
 		}
 	}
 	if modifyType == "modifyUserIncludeText" && modifySiteJson.Server.UserIncludeText != "" {
-		logging.Debug("modifySiteJson.Server.UserIncludeText:", modifySiteJson.Server.UserIncludeText)
 		sourceSiteJson.Server.UserIncludeText = modifySiteJson.Server.UserIncludeText
+	}
+	if modifyType == "modifyUserIncludeHeaderText" && modifySiteJson.Server.UserIncludeHeaderText != "" {
+		sourceSiteJson.Server.UserIncludeHeaderText = modifySiteJson.Server.UserIncludeHeaderText
 	}
 
 	if modifyType == "updateDomain" && modifySiteJson.DomainList != nil {
@@ -637,6 +639,8 @@ func (s *Wafmastersite) ModifySite(request *http.Request) core.Response {
 		logString = "网站【" + sourceSiteJson.SiteName + "】删除域名【" + strings.Join(modifySiteJson.DomainList, ",") + "】"
 	case "modifyUserIncludeText":
 		logString = "网站【" + sourceSiteJson.SiteName + "】修改自定义配置"
+	case "modifyUserIncludeHeaderText":
+		logString = "网站【" + sourceSiteJson.SiteName + "】修改自定义请求头配置"
 	case "modifyLoadBalance":
 		loadName := ""
 		loadGroupInfo, err := public.M("load_balance").Field([]string{"load_name"}).Where("id=?", sourceSiteJson.LoadGroupId).Find()
@@ -2213,6 +2217,9 @@ func SiteListSingleToCluster() error {
 		}
 		siteInfo.Server.UserInclude = types.UserPath + siteInfo.SiteID + ".conf"
 		siteInfo.Server.UserIncludeText, _ = public.ReadFile(siteInfo.Server.UserInclude)
+		siteInfo.Server.UserIncludeHeader = types.UserPath + siteInfo.SiteID + "_set_header.conf"
+		siteInfo.Server.UserIncludeHeaderText, _ = public.ReadFile(siteInfo.Server.UserIncludeHeader)
+
 		siteInfo.Server.Upstream = &types.UpstreamJson{}
 		siteInfo.Server.Upstream.Name = siteInfo.SiteID
 		siteInfo.Server.Upstream.PollingAlgorithm = data.Server.Upstream.PollingAlgorithm
@@ -3192,6 +3199,11 @@ func ParseLocationJson(locationJson types.LocationJson, hostString string, httpP
 			}
 			conf = conf + "\t\tproxy_set_header " + item + ";\n"
 
+		}
+		conf = conf + "\t\tinclude /etc/nginx/user/" + siteJson.SiteID + "_set_header.conf;\n"
+		userSetHeaderFile := types.UserPath + siteJson.SiteID + "_set_header.conf"
+		if !public.FileExists(userSetHeaderFile) {
+			os.WriteFile(userSetHeaderFile, []byte(""), 0644)
 		}
 	}
 	if addSNI {

@@ -172,23 +172,25 @@ type EntrySiteCheck struct {
 }
 
 type ServerJson struct {
-	ListenPort      []string      `json:"listen_port"`
-	ListenSslPort   []string      `json:"listen_ssl_port"`
-	ListenTag       []string      `json:"listen_tag"`
-	ListenIpv6      int           `json:"listen_ipv6"`
-	ServerName      []string      `json:"server_name"`
-	Index           []string      `json:"index"`
-	Root            string        `json:"root"`
-	If              IfConfig      `json:"if"`
-	Ssl             *SiteSsl      `json:"ssl"`
-	UserInclude     string        `json:"user_include"`
-	UserIncludeText string        `json:"user_include_text"`
-	Upstream        *UpstreamJson `json:"upstream"`
-	Gzip            GzipJson      `json:"gzip"`
-	Location        *LocationList `json:"location_list"`
-	Log             LogInfo       `json:"log"`
-	ProxyInfo       ProxyInfo     `json:"proxy_info"`
-	Client          Client        `json:"client"`
+	ListenPort            []string      `json:"listen_port"`
+	ListenSslPort         []string      `json:"listen_ssl_port"`
+	ListenTag             []string      `json:"listen_tag"`
+	ListenIpv6            int           `json:"listen_ipv6"`
+	ServerName            []string      `json:"server_name"`
+	Index                 []string      `json:"index"`
+	Root                  string        `json:"root"`
+	If                    IfConfig      `json:"if"`
+	Ssl                   *SiteSsl      `json:"ssl"`
+	UserInclude           string        `json:"user_include"`
+	UserIncludeText       string        `json:"user_include_text"`
+	UserIncludeHeader     string        `json:"user_include_header"`
+	UserIncludeHeaderText string        `json:"user_include_header_text"`
+	Upstream              *UpstreamJson `json:"upstream"`
+	Gzip                  GzipJson      `json:"gzip"`
+	Location              *LocationList `json:"location_list"`
+	Log                   LogInfo       `json:"log"`
+	ProxyInfo             ProxyInfo     `json:"proxy_info"`
+	Client                Client        `json:"client"`
 }
 
 type Client struct {
