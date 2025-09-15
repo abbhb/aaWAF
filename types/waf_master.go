@@ -185,6 +185,7 @@ type ServerJson struct {
 	UserIncludeText       string        `json:"user_include_text"`
 	UserIncludeHeader     string        `json:"user_include_header"`
 	UserIncludeHeaderText string        `json:"user_include_header_text"`
+	Http2Open             bool          `json:"http2_open"`
 	Upstream              *UpstreamJson `json:"upstream"`
 	Gzip                  GzipJson      `json:"gzip"`
 	Location              *LocationList `json:"location_list"`

@@ -443,6 +443,13 @@ func (s *Wafmastersite) ModifySite(request *http.Request) core.Response {
 		sourceSiteJson.Server.Ssl.SSLCiphers = modifySiteJson.Server.Ssl.SSLCiphers
 	}
 
+	if modifyType == "http2_open" {
+		if sourceSiteJson.Server.Ssl.IsSsl == 0 {
+			return core.Fail(fmt.Errorf("请先开启证书"))
+		}
+		public.SetCheckHttp2(sourceSiteJson.SiteID)
+	}
+
 	if modifyType == "openForceHttps" && sourceSiteJson.Server.Ssl.ForceHttps == 0 && modifySiteJson.Server.Ssl.ForceHttps == 1 {
 		if sourceSiteJson.Server.Ssl.IsSsl == 0 {
 			return core.Fail(fmt.Errorf("请先开启证书"))
@@ -2103,6 +2110,8 @@ func GetSiteListCluster(params types.SiteListParams) ([]types.SiteJson, int, err
 				}
 				siteJson.Server.Ssl.FullChain, _ = public.ReadFile(certFile)
 				siteJson.Server.Ssl.PrivateKey, _ = public.ReadFile(keyFile)
+				siteJson.Server.Http2Open = public.CheckHttp2(siteJson.SiteID)
+
 			}
 			siteJson.WafInfo, _ = GetRulesBySiteId(siteJson.SiteID)
 			siteJson.RegionalRestrictions = GetSpecifySiteRegionRules(siteJson.SiteID)
@@ -3543,7 +3552,11 @@ func ParseRootJson(siteJson types.SiteJson) string {
 
 			count += 1
 			if count == 1 {
-				conf = conf + "\tlisten " + v + defaultServer + " ssl;\n\thttp2 on;\n"
+				if public.CheckHttp2(siteJson.SiteID) {
+					conf = conf + "\tlisten " + v + defaultServer + " ssl;\n\thttp2 on;\n"
+				} else {
+					conf = conf + "\tlisten " + v + defaultServer + " ssl;\n"
+				}
 			} else {
 				conf = conf + "\tlisten " + v + defaultServer + " ssl;\n"
 			}

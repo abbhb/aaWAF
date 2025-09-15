@@ -2764,3 +2764,27 @@ func SaveWAFApi(ApiInfo ApiInfo) {
 	WriteFile("/www/cloud_waf/console/data/btwaf_api.json", string(apiinfoJson))
 
 }
+
+func CheckHttp2(ServerId string) bool {
+	path := "/www/cloud_waf/nginx/conf.d/user/" + ServerId + "_http2.pl"
+	return !FileExists(path)
+}
+
+func SetCheckHttp2(ServerId string) bool {
+	path := "/www/cloud_waf/nginx/conf.d/user/" + ServerId + "_http2.pl"
+	if FileExists(path) {
+		err := os.Remove(path)
+		if err != nil {
+			return false
+		}
+		return true
+
+	} else {
+		file, err := os.Create(path)
+		if err != nil {
+			return false
+		}
+		defer file.Close()
+		return true
+	}
+}
