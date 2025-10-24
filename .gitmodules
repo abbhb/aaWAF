@@ -1,0 +1,3 @@
+[submodule "ParserSpel"]
+	path = ParserSpel
+	url = https://github.com/weaweawe01/ParserSpel.git
