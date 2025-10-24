@@ -84,7 +84,7 @@
 
 - [2] Java代码注入:
   - ❌ OGNL表达式
-  - ❌ SpEL表达式
+  - ✅ SpEL表达式 (2025-10-24更新)
   - ✅ JSP EL表达式
   - ❌ FreeMarker(SSTI)
   - ❌ Velocity(SSTI)
@@ -185,3 +185,4 @@ bash install_cloudwaf.sh offline
 
 ##  开源的引擎
 >1. PHP解析引擎      【已开源】
+>1. SpEL解析引擎      【已开源】
