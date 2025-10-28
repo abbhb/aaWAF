@@ -83,7 +83,7 @@
     - ✅ H2 (2025-08-30更新)
 
 - [2] Java代码注入:
-  - ❌ OGNL表达式
+  - ✅ OGNL表达式 (2025-10-28更新)
   - ✅ SpEL表达式 (2025-10-24更新)
   - ✅ JSP EL表达式
   - ❌ FreeMarker(SSTI)
@@ -186,3 +186,4 @@ bash install_cloudwaf.sh offline
 ##  开源的引擎
 >1. PHP解析引擎      【已开源】
 >1. SpEL解析引擎      【已开源】
+>1. OGNL解析引擎      【已开源】
