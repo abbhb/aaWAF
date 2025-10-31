@@ -3414,10 +3414,14 @@ func CheckDomainPort(domains []string, isReturnSource, checkParse bool) (string,
 		domain = ReplaceHttp(domain)
 		if isReturnSource {
 			if strings.Contains(domain, ":") {
-				ipSplit := strings.Split(domain, ":")
-				domain = ipSplit[0]
-				port := ipSplit[1]
-				portMap[port] = "1"
+				if strings.HasPrefix(domain, "[") && strings.HasSuffix(domain, "]") {
+					portMap["80"] = "80"
+				} else {
+					ipSplit := strings.Split(domain, ":")
+					domain = ipSplit[0]
+					port := ipSplit[len(ipSplit)-1]
+					portMap[port] = "1"
+				}
 			} else {
 				domainMap[domain] = "1"
 			}
