@@ -3530,16 +3530,26 @@ func ParseRootJson(siteJson types.SiteJson) string {
 	if siteJson.SiteID != "default_wildcard_domain_server" {
 		defaultServer = ""
 	}
+	// 检查是否启用proxy_protocol
+	enableProxyProtocol := public.IsProxyProtocolEnabled(siteJson.SiteID)
+	proxyProtocol := ""
+	if enableProxyProtocol {
+		proxyProtocol = " proxy_protocol"
+	}
 	addedPorts := make(map[string]string, 0)
 	conf := "server {\n"
 	for _, v := range siteJson.Server.ListenPort {
 		if _, ok := addedPorts[v]; ok {
 			continue
 		}
-		conf = conf + "\tlisten " + v + defaultServer + ";\n"
+		proxyProtocol := ""
+		if enableProxyProtocol {
+			proxyProtocol = " proxy_protocol"
+		}
+		conf = conf + "\tlisten " + v + defaultServer + proxyProtocol + ";\n"
 
 		if siteJson.Server.ListenIpv6 == 1 {
-			conf = conf + "\tlisten [::]:" + v + defaultServer + ";\n"
+			conf = conf + "\tlisten [::]:" + v + defaultServer + proxyProtocol + ";\n"
 
 		}
 		addedPorts[v] = "1"
@@ -3557,12 +3567,12 @@ func ParseRootJson(siteJson types.SiteJson) string {
 			count += 1
 			if count == 1 {
 				if public.CheckHttp2(siteJson.SiteID) {
-					conf = conf + "\tlisten " + v + defaultServer + " ssl;\n\thttp2 on;\n"
+					conf = conf + "\tlisten " + v + defaultServer + " ssl" + proxyProtocol + ";\n\thttp2 on;\n"
 				} else {
-					conf = conf + "\tlisten " + v + defaultServer + " ssl;\n"
+					conf = conf + "\tlisten " + v + defaultServer + " ssl" + proxyProtocol + ";\n"
 				}
 			} else {
-				conf = conf + "\tlisten " + v + defaultServer + " ssl;\n"
+				conf = conf + "\tlisten " + v + defaultServer + " ssl" + proxyProtocol + ";\n"
 			}
 			addedSslPorts[v] = "1"
 		}
