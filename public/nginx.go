@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"log"
@@ -1584,6 +1585,10 @@ func AddNignxJsonToConf(siteId string, upsteamConf string) {
 	var conf string
 	conf = "server {\n"
 	listenMap := make(map[string]string, 0)
+
+	// 检查是否启用proxy_protocol
+	enableProxyProtocol := IsProxyProtocolEnabled(siteId)
+
 	for _, v := range jsonMap.Server.Listen {
 		if _, ok := listenMap[v[0]]; ok {
 			continue
@@ -1592,9 +1597,13 @@ func AddNignxJsonToConf(siteId string, upsteamConf string) {
 		if siteId != "default_wildcard_domain_server" {
 			defaultServer = ""
 		}
-		conf = conf + "\tlisten " + v[0] + defaultServer + ";\n"
+		proxyProtocol := ""
+		if enableProxyProtocol {
+			proxyProtocol = " proxy_protocol"
+		}
+		conf = conf + "\tlisten " + v[0] + defaultServer + proxyProtocol + ";\n"
 		if jsonMap.Server.ListenIpv6 {
-			conf = conf + "\tlisten [::]:" + v[0] + defaultServer + ";\n"
+			conf = conf + "\tlisten [::]:" + v[0] + defaultServer + proxyProtocol + ";\n"
 
 		}
 		listenMap[v[0]] = "1"
@@ -4112,4 +4121,72 @@ func SiteSourceAddressAutoCheck() {
 			logging.Error("回源域名解析ip变化---重载nginx失败:", err)
 		}
 	}
+}
+
+// ProxyProtocolConfig 存储proxy_protocol配置
+type ProxyProtocolConfig map[string]struct {
+	Enable bool `json:"enable"`
+}
+
+// GetProxyProtocolConfig 从环境变量或JSON文件获取proxy_protocol配置
+// 优先从环境变量 SITE_PROXY_PROTOCOL_CONFIG 读取（base64编码的JSON）
+// 如果环境变量不存在，则从 /data/proxy_protocol_config.json 文件读取
+func GetProxyProtocolConfig() (ProxyProtocolConfig, error) {
+	config := make(ProxyProtocolConfig)
+
+	// 首先尝试从环境变量读取
+	envValue := os.Getenv("SITE_PROXY_PROTOCOL_CONFIG")
+	if envValue != "" {
+		// 解码base64
+		decoded, err := base64.StdEncoding.DecodeString(envValue)
+		if err != nil {
+			return config, err
+		}
+
+		// 解析JSON
+		err = json.Unmarshal(decoded, &config)
+		if err != nil {
+			return config, err
+		}
+
+		return config, nil
+	}
+
+	// 环境变量不存在，尝试从文件读取
+	configFilePath := "/data/proxy_protocol_config.json"
+	if !FileExists(configFilePath) {
+		// 文件不存在，返回空配置
+		return config, nil
+	}
+
+	// 读取文件内容
+	fileData, err := os.ReadFile(configFilePath)
+	if err != nil {
+		// 读取失败，返回空配置（不报错）
+		return config, nil
+	}
+
+	// 解析JSON
+	err = json.Unmarshal(fileData, &config)
+	if err != nil {
+		// 解析失败，返回空配置（不报错）
+		return config, nil
+	}
+
+	return config, nil
+}
+
+// IsProxyProtocolEnabled 检查指定site_id是否启用proxy_protocol
+func IsProxyProtocolEnabled(siteId string) bool {
+	config, err := GetProxyProtocolConfig()
+	if err != nil {
+		logging.Error("获取proxy_protocol配置失败:", err)
+		return false
+	}
+
+	if cfg, ok := config[siteId]; ok {
+		return cfg.Enable
+	}
+
+	return false
 }
